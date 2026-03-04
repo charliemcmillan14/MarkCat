@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>MarketCat Pro · Premium Financial Intelligence</title>
+<meta name="description" content="Live stock quotes, market heatmap, CATS trading, earnings calendar, portfolio tracker, sentiment — the dashboard serious traders use."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=IBM+Plex+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/style.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="go('home')">
+    <svg class="logo-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="4,18 8,4 16,14" stroke="#C9A84C" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+      <polygon points="36,18 32,4 24,14" stroke="#C9A84C" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+      <ellipse cx="20" cy="24" rx="14" ry="12" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+      <path d="M13 22 Q15 19.5 17 22 Q15 23 13 22Z" stroke="#C9A84C" stroke-width="1" fill="rgba(201,168,76,.15)"/>
+      <path d="M23 22 Q25 19.5 27 22 Q25 23 23 22Z" stroke="#C9A84C" stroke-width="1" fill="rgba(201,168,76,.15)"/>
+      <polygon points="20,25 18.5,27 21.5,27" stroke="#C9A84C" stroke-width="1" fill="rgba(201,168,76,.3)"/>
+      <path d="M18.5,27 Q17,29 15.5,28.5" stroke="#C9A84C" stroke-width="1" fill="none" stroke-linecap="round"/>
+      <path d="M21.5,27 Q23,29 24.5,28.5" stroke="#C9A84C" stroke-width="1" fill="none" stroke-linecap="round"/>
+      <line x1="3" y1="24" x2="13" y2="25" stroke="#C9A84C" stroke-width="0.8" opacity="0.6"/>
+      <line x1="3" y1="27" x2="13" y2="26.5" stroke="#C9A84C" stroke-width="0.8" opacity="0.6"/>
+      <line x1="37" y1="24" x2="27" y2="25" stroke="#C9A84C" stroke-width="0.8" opacity="0.6"/>
+      <line x1="37" y1="27" x2="27" y2="26.5" stroke="#C9A84C" stroke-width="0.8" opacity="0.6"/>
+    </svg>
+    <div>
+      <div class="logo-name">Market<em>Cat</em></div>
+      <div class="logo-tag">Pro · Financial Intelligence</div>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <button class="nb active" data-page="home" onclick="go('home')">Home</button>
+
+    <div class="nav-group">
+      <button class="nb" data-page="markets" onclick="go('markets')">Markets ▾</button>
+      <div class="nav-dropdown">
+        <button class="nb" data-page="markets" onclick="go('markets')">Live Prices</button>
+        <button class="nb" data-page="heatmap" onclick="go('heatmap')">Heatmap</button>
+        <button class="nb" data-page="macro"   onclick="go('macro')">Macro</button>
+        <button class="nb" data-page="sector"  onclick="go('sector')">Sectors</button>
+      </div>
+    </div>
+
+    <button class="nb" data-page="quote" onclick="go('quote')">Quote</button>
+
+    <div class="nav-group">
+      <button class="nb" data-page="news" onclick="go('news')">News ▾</button>
+      <div class="nav-dropdown">
+        <button class="nb" data-page="news"     onclick="go('news')">Market News</button>
+        <button class="nb" data-page="earnings" onclick="go('earnings')">Earnings</button>
+      </div>
+    </div>
+
+    <button class="nb" data-page="crypto" onclick="go('crypto')">Crypto</button>
+    <button class="nb pro-badge" data-page="cats" onclick="go('cats')" style="color:var(--gold)">CATS 🐱</button>
+
+    <div class="nav-group">
+      <button class="nb pro-badge" data-page="portfolio" onclick="go('portfolio')">Tools ▾</button>
+      <div class="nav-dropdown">
+        <button class="nb" data-page="watchlist"  onclick="go('watchlist')">Watchlist &amp; Alerts</button>
+        <button class="nb" data-page="portfolio"  onclick="go('portfolio')">Portfolio</button>
+        <button class="nb" data-page="simulator"  onclick="go('simulator')">Simulator</button>
+        <button class="nb" data-page="sentiment"  onclick="go('sentiment')">Sentiment</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <div class="live-dot"></div>
+    <span id="liveStatus">Connecting…</span>
+  </div>
+</nav>
+
+<div class="ticker-wrap">
+  <div class="ticker-rail" id="tickerRail">
+    <span class="ti"><span class="ti-sym">AAPL</span><span class="ti-price">—</span></span>
+    <span class="ti"><span class="ti-sym">MSFT</span><span class="ti-price">—</span></span>
+    <span class="ti"><span class="ti-sym">NVDA</span><span class="ti-price">—</span></span>
+    <span class="ti"><span class="ti-sym">TSLA</span><span class="ti-price">—</span></span>
+    <span class="ti"><span class="ti-sym">META</span><span class="ti-price">—</span></span>
+    <span class="ti"><span class="ti-sym">AMZN</span><span class="ti-price">—</span></span>
+    <span class="ti"><span class="ti-sym">GOOGL</span><span class="ti-price">—</span></span>
+    <span class="ti"><span class="ti-sym">JPM</span><span class="ti-price">—</span></span>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-eyebrow">MarketCat Pro · Real-Time Financial Intelligence</div>
+      <h1 class="hero-h">The dashboard<br/><em>serious traders</em> rely on.</h1>
+      <p class="hero-sub">Live quotes · Market heatmap · CATS trading · Sentiment analysis · Earnings calendar · Portfolio tracking · News from 6+ sources</p>
+      <div class="hero-btns">
+        <button class="btn btn-gold" onclick="go('markets')">Live Markets →</button>
+        <button class="btn" onclick="go('cats')">Trade CATS 🐱</button>
+        <button class="btn" onclick="go('heatmap')">Market Heatmap</button>
+        <button class="btn" onclick="go('sentiment')">Fear &amp; Greed</button>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-tile" onclick="goQuote('AAPL')" id="tile-aapl">
+        <div class="st-label">Apple · AAPL</div>
+        <div class="st-price">—</div>
+        <div class="st-chg muted">—</div>
+      </div>
+      <div class="stat-tile" onclick="goQuote('MSFT')" id="tile-msft">
+        <div class="st-label">Microsoft · MSFT</div>
+        <div class="st-price">—</div>
+        <div class="st-chg muted">—</div>
+      </div>
+      <div class="stat-tile" onclick="goQuote('NVDA')" id="tile-nvda">
+        <div class="st-label">NVIDIA · NVDA</div>
+        <div class="st-price">—</div>
+        <div class="st-chg muted">—</div>
+      </div>
+      <div class="stat-tile" onclick="goQuote('TSLA')" id="tile-tsla">
+        <div class="st-label">Tesla · TSLA</div>
+        <div class="st-price">—</div>
+        <div class="st-chg muted">—</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start">
+      <div>
+        <div class="sec-title"><em>//</em> Today's Biggest Movers — click to view full chart &amp; news</div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+          <table class="tbl">
+            <thead><tr><th>Symbol</th><th>Price</th><th>Change %</th><th>Change $</th><th>Range</th></tr></thead>
+            <tbody id="homeMovers"><tr><td colspan="5" class="state-loading">Loading market data…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="sec-title"><em>//</em> Explore Pro Features</div>
+        <div class="card card-gold" onclick="go('cats')" style="cursor:pointer">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--gold);margin-bottom:8px;text-transform:uppercase">🐱 Simulated Exchange</div>
+          <div style="font-family:var(--serif);font-size:17px;margin-bottom:5px">CATS Trading</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.6">Live simulated crypto exchange. Real price movement, order book, wallet.</div>
+          <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--gold)">Open Exchange →</div>
+        </div>
+        <div class="card" onclick="go('heatmap')" style="cursor:pointer">
+          <div style="font-family:var(--serif);font-size:17px;margin-bottom:5px">Market Heatmap</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.6">80+ stocks, 8 sectors, color-coded by performance.</div>
+          <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--text3)">View Heatmap →</div>
+        </div>
+        <div class="card" onclick="go('macro')" style="cursor:pointer">
+          <div style="font-family:var(--serif);font-size:17px;margin-bottom:5px">Macro Dashboard</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.6">Yield curve, bonds, gold, VIX, dollar index.</div>
+          <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--text3)">View Macro →</div>
+        </div>
+        <div class="card" onclick="go('watchlist')" style="cursor:pointer">
+          <div style="font-family:var(--serif);font-size:17px;margin-bottom:5px">Watchlist &amp; Alerts</div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.6">Save stocks. Get in-page price alerts when targets hit.</div>
+          <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--text3)">Open Watchlist →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MARKETS -->
+<div id="page-markets" class="page">
+  <div class="wrap">
+    <div class="pg-hdr">
+      <div class="pg-lbl">// Live Prices</div>
+      <div class="pg-title">Markets</div>
+      <div class="pg-sub">
+        <a onclick="go('heatmap')" style="color:var(--gold);cursor:pointer">Heatmap</a> ·
+        <a onclick="go('macro')"   style="color:var(--gold);cursor:pointer">Macro</a> ·
+        <a onclick="go('sector')"  style="color:var(--gold);cursor:pointer">Sectors</a>
+      </div>
+    </div>
+    <div class="markets-layout">
+      <div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+          <table class="tbl">
+            <thead><tr><th>Symbol</th><th>Price</th><th>Chg %</th><th>Chg $</th></tr></thead>
+            <tbody id="marketsList"><tr><td colspan="4" class="state-loading">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="chart-wrap">
+          <div class="chart-hdr">
+            <span class="chart-label" id="marketsChartLabel">Click a stock to load its chart</span>
+          </div>
+          <div id="marketsChartWrap" class="chart-canvas-wrap" style="height:300px">
+            <canvas id="marketsChart" style="width:100%;height:100%"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QUOTE -->
+<div id="page-quote" class="page">
+  <div class="wrap-sm">
+    <div class="pg-hdr">
+      <div class="pg-lbl">// Stock Lookup</div>
+      <div class="pg-title">Quote</div>
+    </div>
+    <div class="search-bar">
+      <input id="quoteInput" class="search-input" type="text"
+        placeholder="AAPL, TSLA, NVDA…" maxlength="12"
+        style="width:280px;text-transform:uppercase"
+        onkeydown="if(event.key==='Enter')searchQuote()"/>
+      <button class="btn btn-gold" onclick="searchQuote()">Look Up →</button>
+      <button class="btn btn-ghost" onclick="goQuote('AAPL')">AAPL</button>
+      <button class="btn btn-ghost" onclick="goQuote('NVDA')">NVDA</button>
+      <button class="btn btn-ghost" onclick="goQuote('TSLA')">TSLA</button>
+    </div>
+    <div id="quotePanel"><div class="state-empty">Enter a symbol to get a live quote, 90-day chart, and recent news.</div></div>
+  </div>
+</div>
+
+<!-- NEWS -->
+<div id="page-news" class="page">
+  <div class="wrap">
+    <div class="pg-hdr">
+      <div class="pg-lbl">// Reuters · MarketWatch · Yahoo Finance · Finnhub · SEC EDGAR</div>
+      <div class="pg-title">News Feed</div>
+      <div class="pg-sub">Aggregated from 5+ sources · Filter by category · Search any symbol for company news</div>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+      <div class="search-bar" style="margin-bottom:0">
+        <input id="newsInput" class="search-input" type="text"
+          placeholder="AAPL — company news" maxlength="12"
+          style="text-transform:uppercase"
+          onkeydown="if(event.key==='Enter')searchNews()"/>
+        <button class="btn btn-gold" onclick="searchNews()">Search →</button>
+        <button class="btn btn-ghost" onclick="loadMarketNews();$('newsInput').value=''">All Sources</button>
+      </div>
+    </div>
+    <div id="newsSourceBar"></div>
+    <div class="source-pills" style="margin-bottom:20px">
+      <button class="pill active" onclick="setNewsFilter('all',this)">All</button>
+      <button class="pill" onclick="setNewsFilter('general',this)">General</button>
+      <button class="pill" onclick="setNewsFilter('forex',this)">Forex</button>
+      <button class="pill" onclick="setNewsFilter('merger',this)">M&amp;A</button>
+      <button class="pill" onclick="setNewsFilter('crypto',this)">Crypto</button>
+      <button class="pill" onclick="setNewsFilter('reuters',this)">Reuters</button>
+      <button class="pill" onclick="setNewsFilter('marketwatch',this)">MarketWatch</button>
+      <button class="pill" onclick="setNewsFilter('yahoo',this)">Yahoo Finance</button>
+      <button class="pill" onclick="setNewsFilter('sec',this)">SEC Filings</button>
+    </div>
+    <div id="newsFeed"><div class="state-loading">Loading news…</div></div>
+  </div>
+</div>
+
+<!-- CRYPTO -->
+<div id="page-crypto" class="page">
+  <div class="wrap">
+    <div class="pg-hdr">
+      <div class="pg-lbl">// Live via CoinGecko</div>
+      <div class="pg-title">Crypto Prices</div>
+      <div class="pg-sub">Top 8 coins · 24h and 7-day change · <a onclick="go('cats')" style="color:var(--gold);cursor:pointer">Trade CATS on our simulated exchange →</a></div>
+    </div>
+    <div id="cryptoGrid"><div class="state-loading">Loading…</div></div>
+  </div>
+</div>
+
+<!-- CATS -->
+<div id="page-cats" class="page">
+  <div class="wrap">
+    <div class="breadcrumb">
+      <a onclick="go('crypto')">Crypto</a><span>/</span>
+      <span style="color:var(--gold)">CATS Exchange</span>
+    </div>
+    <div class="pg-hdr">
+      <div class="pg-lbl">// Simulated Exchange · Paper Trading Only</div>
+      <div class="pg-title">CATS Token Exchange</div>
+      <div class="pg-sub" style="color:var(--amber)">⚠ Simulated environment — no real money involved. Prices randomly generated for demonstration purposes.</div>
+    </div>
+    <div id="catsPage"><div class="state-loading">Initializing CATS exchange…</div></div>
+  </div>
+</div>
+
+<!-- HEATMAP -->
+<div id="page-heatmap" class="page">
+  <div class="wrap">
+    <div class="breadcrumb">
+      <a onclick="go('markets')">Markets</a><span>/</span>
+      <span style="color:var(--gold)">Heatmap</span>
+    </div>
+    <div class="pg-hdr">
+      <div class="pg-lbl">// S&amp;P 500 · Performance Grid</div>
+      <div class="pg-title">Market Heatmap</div>
+      <div class="pg-sub">80+ stocks · 8 sectors · Green = up · Red = down · Hover for details · Click for full quote</div>
+    </div>
+    <div id="heatmapContent"><div class="state-loading">Loading heatmap…</div></div>
+  </div>
+</div>
+
+<!-- MACRO -->
+<div id="page-macro" class="page">
+  <div class="wrap">
+    <div class="breadcrumb">
+      <a onclick="go('markets')">Markets</a><span>/</span>
+      <span style="color:var(--gold)">Macro</span>
+    </div>
+    <div class="pg-hdr">
+      <div class="pg-lbl">// Indices · Bonds · Sectors · Commodities</div>
+      <div class="pg-title">Macro Dashboard</div>
+      <div class="pg-sub">Yield curve signal · Sector ETF performance · Gold, dollar, volatility · Click any card for full quote</div>
+    </div>
+    <div id="macroContent"><div class="state-loading">Loading macro data…</div></div>
+  </div>
+</div>
+
+<!-- SECTOR -->
+<div id="page-sector" class="page">
+  <div class="wrap">
+    <div class="breadcrumb">
+      <a onclick="go('macro')">Macro</a><span>/</span>
+      <span style="color:var(--gold)">Sectors</span>
+    </div>
+    <div class="pg-hdr">
+      <div class="pg-lbl">// Sector Deep-Dive</div>
+      <div class="pg-title">Sector Analysis</div>
+      <div class="pg-sub">Switch between sectors · ETF performance · All sector stocks with live quotes</div>
+    </div>
+    <div id="sectorContent"><div class="state-loading">Loading sector data…</div></div>
+  </div>
+</div>
+
+<!-- WATCHLIST -->
+<div id="page-watchlist" class="page">
+  <div class="wrap">
+    <div class="pg-hdr">
+      <div class="pg-lbl">// Saved Locally · Auto-Refresh Every 60s</div>
+      <div class="pg-title">Watchlist &amp; Price Alerts</div>
+      <div class="pg-sub">Track stocks and get notified when price targets are hit</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;margin-bottom:32px">
+      <div class="card">
+        <div class="sec-title"><em>//</em> Add to Watchlist</div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <input id="watchInput" class="search-input" type="text" placeholder="AAPL" maxlength="10"
+            style="text-transform:uppercase" onkeydown="if(event.key==='Enter')addToWatchlist()"/>
+          <button class="btn btn-gold" onclick="addToWatchlist()">+ Add</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="sec-title"><em>//</em> Set Price Alert</div>
+        <div class="alert-form" style="margin-top:8px">
+          <div><label>Symbol</label><input id="alertSym" type="text" placeholder="AAPL" maxlength="10" style="width:80px;text-transform:uppercase"/></div>
+          <div><label>Type</label>
+            <select id="alertType" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:var(--radius);font-family:var(--mono);font-size:11px;outline:none">
+              <option value="above">Rises above</option>
+              <option value="below">Drops below</option>
+            </select>
+          </div>
+          <div><label>Target ($)</label><input id="alertTarget" type="number" placeholder="200.00" step="0.01" min="0.01" style="width:110px"/></div>
+          <button class="btn btn-gold" onclick="addAlert()" style="margin-top:19px">Set 🔔</button>
+        </div>
+      </div>
+    </div>
+    <div class="sec-title"><em>//</em> Your Watchlist</div>
+    <div id="watchlistTable" style="margin-bottom:32px"><div class="state-loading">Loading…</div></div>
+    <div class="sec-title"><em>//</em> Price Alerts</div>
+    <div id="alertsList"><div class="state-empty">No alerts set.</div></div>
+  </div>
+</div>
+
+<!-- SENTIMENT -->
+<div id="page-sentiment" class="page">
+  <div class="wrap">
+    <div class="pg-hdr">
+      <div class="pg-lbl">// Pro Feature · Live Analysis</div>
+      <div class="pg-title">Market Sentiment</div>
+      <div class="pg-sub">Fear &amp; Greed Index built from real price data across 18 major stocks</div>
+    </div>
+    <div id="sentimentContent"><div class="state-loading">Analyzing sentiment…</div></div>
+  </div>
+</div>
+
+<!-- EARNINGS -->
+<div id="page-earnings" class="page">
+  <div class="wrap">
+    <div class="pg-hdr">
+      <div class="pg-lbl">// 60-Day Calendar</div>
+      <div class="pg-title">Earnings Calendar</div>
+      <div class="pg-sub">Upcoming earnings, EPS estimates vs actuals, beat/miss for 25 major stocks</div>
+    </div>
+    <div id="earningsContent"><div class="state-loading">Loading earnings calendar…</div></div>
+  </div>
+</div>
+
+<!-- PORTFOLIO -->
+<div id="page-portfolio" class="page">
+  <div class="wrap">
+    <div class="pg-hdr">
+      <div class="pg-lbl">// Saved In Your Browser</div>
+      <div class="pg-title">Portfolio Tracker</div>
+      <div class="pg-sub">Live P&amp;L · Allocation pie · Total value · <a onclick="go('watchlist')" style="color:var(--gold);cursor:pointer">Set price alerts →</a></div>
+    </div>
+    <div class="card" style="margin-bottom:28px">
+      <div class="sec-title" style="margin-bottom:16px"><em>//</em> Add a Holding</div>
+      <div class="port-add">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:5px">Symbol</div>
+          <input id="portSym" class="port-input port-sym" type="text" placeholder="AAPL" maxlength="10" onkeydown="if(event.key==='Enter')addHolding()" style="text-transform:uppercase"/>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:5px">Shares</div>
+          <input id="portQty" class="port-input port-qty" type="number" placeholder="10" min="0.001" step="any"/>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:5px">Avg Cost / Share</div>
+          <input id="portCost" class="port-input port-cost" type="number" placeholder="150.00" min="0.01" step="any"/>
+        </div>
+        <button class="btn btn-gold" onclick="addHolding()" style="margin-top:19px">Add Holding</button>
+      </div>
+    </div>
+    <div class="portfolio-layout">
+      <div id="portTable"><div class="state-empty" style="padding:40px">No holdings yet.</div></div>
+      <div class="port-summary" id="portSummary"><div class="state-empty">No holdings yet.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SIMULATOR -->
+<div id="page-simulator" class="page">
+  <div class="wrap">
+    <div class="pg-hdr">
+      <div class="pg-lbl">// Risk Management</div>
+      <div class="pg-title">Position Sizing</div>
+      <div class="pg-sub">Know exactly how many shares to buy so you never risk more than you're comfortable with</div>
+    </div>
+    <div class="sim-layout">
+      <div>
+        <div class="sim-card">
+          <div class="sim-field"><label>Account Size ($)</label><input id="simAcct" type="number" value="50000" min="100" oninput="calcPosition()"/></div>
+          <div class="sim-field"><label>Risk Per Trade (% of account)</label><input id="simRisk" type="number" value="1" step="0.1" min="0.1" max="20" oninput="calcPosition()"/></div>
+          <div class="sim-field"><label>Entry Price ($)</label><input id="simEntry" type="number" value="150" min="0.01" step="any" oninput="calcPosition()"/></div>
+          <div class="sim-field"><label>Stop Loss Price ($)</label><input id="simStop" type="number" value="144" min="0.01" step="any" oninput="calcPosition()"/></div>
+          <div class="sim-field"><label>Price Target ($)</label><input id="simTarget" type="number" value="165" min="0.01" step="any" oninput="calcPosition()"/></div>
+          <div class="sim-tip">Risk 1–2% per trade. Fill in your account size, where you'd buy, where you'd cut if wrong, and your target. The calculator tells you exactly how many shares to buy.</div>
+        </div>
+      </div>
+      <div id="simResults"><div class="state-empty">Fill in the fields to calculate.</div></div>
+    </div>
+  </div>
+</div>
+
+<footer style="border-top:1px solid var(--border);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:40px">
+  <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="go('home')">
+    <svg width="20" height="20" viewBox="0 0 40 40" fill="none">
+      <polygon points="4,18 8,4 16,14" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+      <polygon points="36,18 32,4 24,14" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+      <ellipse cx="20" cy="24" rx="14" ry="12" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+    </svg>
+    <span style="font-family:var(--serif);font-size:14px;color:var(--text2)">MarketCat <em style="color:var(--gold)">Pro</em></span>
+  </div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">
+    Finnhub · CoinGecko · Reuters · MarketWatch · Yahoo Finance · SEC EDGAR &nbsp;·&nbsp; Not financial advice
+  </div>
+  <div style="font-family:var(--mono);font-size:10px;color:var(--text3)">Keys: 1–9 · M=Macro · P=Portfolio · S=Simulator</div>
+</footer>
+
+<div id="toast"></div>
+
+<script src="js/utils.js"></script>
+<script src="js/data.js"></script>
+<script src="js/ticker.js"></script>
+<script src="js/router.js"></script>
+<script src="js/pages-home-markets.js"></script>
+<script src="js/pages-quote-news-crypto.js"></script>
+<script src="js/pages-premium.js"></script>
+<script src="js/pages-cats.js"></script>
+<script src="js/pages-macro-sectors.js"></script>
+<script src="js/pages-watchlist.js"></script>
+<script src="js/pages-heatmap.js"></script>
+<script>
+(async function boot() {
+  handleHash();
+  await initHome();
+  setInterval(async () => {
+    try {
+      await fetchMovers();
+      buildTicker();
+      renderHomeTiles();
+      checkAllAlerts();
+      const ls = $('liveStatus');
+      if (ls) ls.textContent = 'LIVE · ' + new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    } catch(e) { console.warn('Refresh:', e.message); }
+  }, 90000);
+})();
+</script>
+</body>
+</html>
